@@ -1,0 +1,13 @@
+# Environment / secrets
+.env
+agent-config/.env
+
+# Agent workspace runtime files (keep .gitkeep only)
+agent-workspace/*
+!agent-workspace/.gitkeep
+
+# macOS
+.DS_Store
+
+# Docker
+*.log

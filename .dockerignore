@@ -1,0 +1,9 @@
+.git
+.gitignore
+.dockerignore
+.env
+*.md
+agent-workspace
+agent-config
+proxy-config
+scripts

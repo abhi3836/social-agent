@@ -1,0 +1,47 @@
+services:
+  agent-platform:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: agent-sandbox
+    user: "agent"
+    read_only: true
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    mem_limit: 2g
+    mem_reservation: 512m
+    cpus: 2.0
+    tmpfs:
+      - /tmp:size=100M,noexec,nosuid
+      - /run:size=10M,noexec,nosuid
+    volumes:
+      - ./agent-workspace:/home/agent/workspace
+      - ./agent-config:/home/agent/.config:ro
+    environment:
+      - LANG=C.UTF-8
+      - HTTP_PROXY=http://egress-proxy:3128
+      - HTTPS_PROXY=http://egress-proxy:3128
+    depends_on:
+      - egress-proxy
+    networks:
+      - agent-internal
+    restart: unless-stopped
+
+  egress-proxy:
+    image: ubuntu/squid:latest
+    container_name: egress-proxy
+    volumes:
+      - ./proxy-config/squid.conf:/etc/squid/squid.conf:ro
+    networks:
+      - agent-internal
+      - proxy-external
+    restart: unless-stopped
+
+networks:
+  agent-internal:
+    driver: bridge
+    internal: true    # agent can only reach the proxy, not the internet
+  proxy-external:
+    driver: bridge    # proxy can reach the internet

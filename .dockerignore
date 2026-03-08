@@ -7,3 +7,6 @@ agent-workspace
 agent-config
 proxy-config
 scripts
+agent/tests
+__pycache__
+*.pyc

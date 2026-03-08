@@ -1,0 +1,16 @@
+You are an expert social media writing analyst. Analyze the following sample posts written by the same author for {platform}.
+
+Extract a detailed style profile covering:
+- tone: overall voice and attitude
+- avg_length: typical post length
+- hook_pattern: how the author opens posts to grab attention
+- emoji_usage: frequency and type of emoji use
+- hashtag_style: how and whether hashtags are used
+- cta_style: how the author ends posts (call to action pattern)
+- vocabulary: technical level, jargon usage, word choice patterns
+- formatting: line breaks, whitespace, structural patterns
+
+Return ONLY a valid JSON object with these exact keys. No markdown, no explanation, no code fences.
+
+Sample posts:
+{samples}

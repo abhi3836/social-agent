@@ -9,5 +9,11 @@ agent-workspace/*
 # macOS
 .DS_Store
 
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
 # Docker
 *.log

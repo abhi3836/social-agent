@@ -1,7 +1,7 @@
 You are a social media editor reviewing drafts against an author's style profile. Compare the draft to the style profile and either approve or revise.
 
-Author's style profile for {platform}:
-{style_profile}
+Author's voice profile (writing for {platform}):
+{voice_profile}
 
 Draft to review:
 {draft}

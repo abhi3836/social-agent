@@ -10,6 +10,11 @@ class AgentConfig(BaseSettings):
     claude_model: str = "claude-sonnet-4-20250514"
     openai_api_key: Optional[str] = None
     sd_api_url: Optional[str] = None
+    twitter_api_key: Optional[str] = None
+    twitter_api_secret: Optional[str] = None
+    twitter_access_token: Optional[str] = None
+    twitter_access_token_secret: Optional[str] = None
+    twitter_auto_post: bool = False
     post_platforms: list[str] = Field(default=["twitter", "linkedin"])
     suggestion_count: int = 5
     style_reanalyze: bool = False

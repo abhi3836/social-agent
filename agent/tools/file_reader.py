@@ -20,10 +20,13 @@ class FileReader:
         return path.read_text(encoding="utf-8")
 
     def list_raw_thoughts(self) -> list[str]:
-        """List all raw thought filenames, sorted alphabetically."""
+        """List all raw thought filenames (.md and .txt), sorted alphabetically."""
         if not self.raw_thoughts_dir.exists():
             return []
-        return sorted([f.name for f in self.raw_thoughts_dir.glob("*.md")])
+        files = list(self.raw_thoughts_dir.glob("*.md")) + list(
+            self.raw_thoughts_dir.glob("*.txt")
+        )
+        return sorted([f.name for f in files])
 
     def list_unprocessed_thoughts(self, output_dir: Path) -> list[str]:
         """Return raw thoughts that don't yet have a corresponding output folder."""
@@ -31,12 +34,19 @@ class FileReader:
         processed = set()
         if output_dir.exists():
             processed = {d.name for d in output_dir.iterdir() if d.is_dir()}
-        return [t for t in all_thoughts if t.replace(".md", "") not in processed]
+        return [
+            t for t in all_thoughts
+            if t.replace(".md", "").replace(".txt", "") not in processed
+        ]
 
-    def read_style_reference(self, platform: str) -> Optional[str]:
-        """Read platform-specific style reference samples."""
-        path = self.style_ref_dir / f"{platform}-samples.md"
-        if not path.exists():
-            logger.warning(f"Style reference not found: {path}")
+    def read_voice_profile(self) -> Optional[str]:
+        """Read the author's voice profile from input/style-reference/."""
+        if not self.style_ref_dir.exists():
             return None
-        return path.read_text(encoding="utf-8")
+        files = sorted(
+            [f for f in self.style_ref_dir.iterdir() if f.suffix in (".md", ".txt")]
+        )
+        if not files:
+            logger.warning(f"No voice profile found in {self.style_ref_dir}")
+            return None
+        return "\n\n".join(f.read_text(encoding="utf-8") for f in files)

@@ -1,10 +1,10 @@
-from models.style_profile import StyleProfile, PlatformStyle
+from models.style_profile import StyleProfile, VoiceProfile
 from models.draft import Draft
 from models.suggestion import PostSuggestion, SuggestionSet
 
 __all__ = [
     "StyleProfile",
-    "PlatformStyle",
+    "VoiceProfile",
     "Draft",
     "PostSuggestion",
     "SuggestionSet",

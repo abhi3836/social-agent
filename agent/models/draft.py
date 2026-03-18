@@ -13,3 +13,4 @@ class Draft(BaseModel):
     source_file: str
     generated_at: datetime
     image_suggestion: Optional[str] = None
+    posted_ids: list[str] = []

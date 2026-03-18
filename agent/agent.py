@@ -79,6 +79,7 @@ def _process_thought(filename, style_profile, writer, img_gen):
         "platforms": [d.platform for d in drafts],
     }
     file_writer.write_metadata(filename, metadata)
+    file_writer.archive_raw_thought(filename)
     logger.info(f"Completed: {filename}")
 
 
@@ -180,10 +181,10 @@ def run(run_all):
 
 
 @cli.command()
-@click.option("--interval", default=30, help="Polling interval in seconds.")
+@click.option("--interval", default=90, help="Polling interval in seconds (default: 90 = 15 sec).")
 def watch(interval):
     """Watch mode — poll for new raw thoughts and auto-process."""
-    logger.info(f"Watch mode started. Polling every {interval}s.")
+    logger.info(f"Watch mode started. Polling every {interval}s ({interval // 60}m).")
     style_profile = _get_style_profile()
     writer = PostWriter(config)
     img_gen = ImageGenerator(config, file_writer)

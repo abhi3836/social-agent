@@ -49,7 +49,7 @@ class PostSuggester:
         chain = self.prompt | self.llm | self.parser
         result = chain.invoke(
             {
-                "style_profile": style_profile.model_dump_json(),
+                "voice_profile": style_profile.voice,
                 "recent_themes": recent_content
                 if recent_content
                 else "No recent thoughts available.",

@@ -13,13 +13,18 @@ class FileWriter:
         self.workspace = Path(workspace_root)
         self.drafts_dir = self.workspace / "output" / "drafts"
         self.suggestions_dir = self.workspace / "output" / "suggestions"
+        self.archive_dir = self.workspace / "input" / "archive"
 
     def _ensure_dir(self, path: Path) -> None:
         path.mkdir(parents=True, exist_ok=True)
 
+    @staticmethod
+    def _slug(source_filename: str) -> str:
+        return Path(source_filename).stem
+
     def write_draft(self, source_filename: str, platform: str, content: str) -> Path:
         """Write a platform-specific draft markdown file."""
-        slug = source_filename.replace(".md", "")
+        slug = self._slug(source_filename)
         draft_dir = self.drafts_dir / slug
         self._ensure_dir(draft_dir)
         out_path = draft_dir / f"{platform}-draft.md"
@@ -29,7 +34,7 @@ class FileWriter:
 
     def write_image(self, source_filename: str, platform: str, image_bytes: bytes) -> Path:
         """Write a generated image file."""
-        slug = source_filename.replace(".md", "")
+        slug = self._slug(source_filename)
         draft_dir = self.drafts_dir / slug
         self._ensure_dir(draft_dir)
         out_path = draft_dir / f"image-{platform}.png"
@@ -39,7 +44,7 @@ class FileWriter:
 
     def write_metadata(self, source_filename: str, metadata: dict) -> Path:
         """Write metadata.json for a draft folder."""
-        slug = source_filename.replace(".md", "")
+        slug = self._slug(source_filename)
         draft_dir = self.drafts_dir / slug
         self._ensure_dir(draft_dir)
         out_path = draft_dir / "metadata.json"
@@ -55,9 +60,18 @@ class FileWriter:
         logger.info(f"Wrote suggestions: {out_path}")
         return out_path
 
+    def archive_raw_thought(self, source_filename: str) -> Path:
+        """Move a processed raw thought to input/archive/."""
+        self._ensure_dir(self.archive_dir)
+        src = self.workspace / "input" / "raw-thoughts" / source_filename
+        dest = self.archive_dir / source_filename
+        src.rename(dest)
+        logger.info(f"Archived: {source_filename} → input/archive/")
+        return dest
+
     def write_error(self, source_filename: str, error_msg: str) -> Path:
         """Write an error log in the draft folder."""
-        slug = source_filename.replace(".md", "")
+        slug = self._slug(source_filename)
         draft_dir = self.drafts_dir / slug
         self._ensure_dir(draft_dir)
         out_path = draft_dir / "error.log"

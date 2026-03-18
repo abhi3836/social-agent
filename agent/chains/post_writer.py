@@ -11,6 +11,7 @@ from langchain_core.prompts import PromptTemplate
 from config import AgentConfig
 from models.draft import Draft
 from models.style_profile import StyleProfile
+from tools.twitter_publisher import TwitterPublisher
 
 logger = logging.getLogger("social-agent")
 
@@ -47,6 +48,7 @@ class PostWriter:
                 "twitter", twitter_content, style_profile
             )
             image_suggestion = self._extract_image_suggestion(twitter_content)
+            tweet_ids = self._auto_post_twitter(twitter_content)
             drafts.append(
                 Draft(
                     platform="twitter",
@@ -55,6 +57,7 @@ class PostWriter:
                     source_file=source_filename,
                     generated_at=datetime.now(timezone.utc),
                     image_suggestion=image_suggestion,
+                    posted_ids=tweet_ids,
                 )
             )
 
@@ -81,7 +84,7 @@ class PostWriter:
         chain = self.twitter_prompt | self.llm
         result = chain.invoke(
             {
-                "style_profile": style.twitter.model_dump_json(),
+                "voice_profile": style.voice,
                 "raw_thought": raw_thought,
             }
         )
@@ -91,9 +94,8 @@ class PostWriter:
         chain = self.linkedin_prompt | self.llm
         result = chain.invoke(
             {
-                "style_profile": style.linkedin.model_dump_json(),
+                "voice_profile": style.voice,
                 "raw_thought": raw_thought,
-                "avg_length": style.linkedin.avg_length,
             }
         )
         return result.content
@@ -101,16 +103,26 @@ class PostWriter:
     def _self_critique(
         self, platform: str, draft: str, style: StyleProfile
     ) -> str:
-        platform_style = getattr(style, platform)
         chain = self.critique_prompt | self.llm
         result = chain.invoke(
             {
                 "platform": platform,
-                "style_profile": platform_style.model_dump_json(),
+                "voice_profile": style.voice,
                 "draft": draft,
             }
         )
         return result.content
+
+    def _auto_post_twitter(self, content: str) -> list[str]:
+        """Post to Twitter if auto-post is enabled and credentials are configured."""
+        if not self.config.twitter_auto_post:
+            return []
+        try:
+            publisher = TwitterPublisher(self.config)
+            return publisher.post(content)
+        except Exception as e:
+            logger.error(f"Twitter auto-post failed: {e}")
+            return []
 
     @staticmethod
     def _extract_image_suggestion(content: str) -> str | None:

@@ -42,4 +42,4 @@ WORKDIR /home/agent/workspace
 
 # Use tini as PID 1 for proper signal handling
 ENTRYPOINT ["tini", "--"]
-CMD ["sleep", "infinity"]
+CMD ["python", "/opt/agent/agent.py", "watch"]

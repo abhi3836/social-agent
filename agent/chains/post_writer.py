@@ -37,7 +37,11 @@ class PostWriter:
         )
 
     def write(
-        self, raw_thought: str, style_profile: StyleProfile, source_filename: str
+        self,
+        raw_thought: str,
+        style_profile: StyleProfile,
+        source_filename: str,
+        skip_auto_post: bool = False,
     ) -> list[Draft]:
         """Generate drafts for all configured platforms."""
         drafts = []
@@ -48,7 +52,7 @@ class PostWriter:
                 "twitter", twitter_content, style_profile
             )
             image_suggestion = self._extract_image_suggestion(twitter_content)
-            tweet_ids = self._auto_post_twitter(twitter_content)
+            tweet_ids = [] if skip_auto_post else self._auto_post_twitter(twitter_content)
             drafts.append(
                 Draft(
                     platform="twitter",
